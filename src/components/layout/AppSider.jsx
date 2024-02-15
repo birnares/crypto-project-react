@@ -1,47 +1,19 @@
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons'
 import { Card, Layout, List, Spin, Statistic, Tag, Typography } from 'antd'
-import { useEffect, useState } from 'react'
-import { fakeFetchAssets, fakeFetchData } from '../../api'
-import { capitalize, percentDifference } from '../../utils/utils.js'
+import { useContext } from 'react'
+import CryptoContext from '../../context/crypto-context'
+import { capitalize } from '../../utils/utils.js'
 
 const siderStyle = {
 	padding: '1rem',
 }
 
 export default function AppSider() {
-	const [loading, setLoading] = useState(false)
-	const [crypto, setCrypto] = useState([])
-	const [assets, setAssets] = useState([])
+	const { loading, assets } = useContext(CryptoContext)
 
-	useEffect(() => {
-		async function preload() {
-			setLoading(true)
-
-			const { result } = await fakeFetchData()
-			const assets = await fakeFetchAssets()
-
-			setCrypto(result)
-			setAssets(
-				assets.map(asset => {
-					const coin = result.find(c => c.id === asset.id)
-					return {
-						grow: asset.price < coin.price,
-						growPercent: percentDifference(asset.price, coin.price),
-						totalAmount: asset.amount * coin.price,
-						totalProfit: asset.amount * coin.price - asset.amount * asset.price,
-						...asset,
-					}
-				})
-			)
-
-			setLoading(false)
-		}
-		preload()
-	}, [])
-	loading && <Spin fullscreen />
-	// if (loading) {
-	// 	return <Spin fullscreen />
-	// }
+	if (loading) {
+		return <Spin fullscreen />
+	}
 
 	return (
 		<Layout.Sider width='25%' style={siderStyle}>
